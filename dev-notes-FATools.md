@@ -16,6 +16,10 @@ I don't know if this doc should be included in the main repo, made into its own 
 
 Overall, package documentation sucks and really needs to be reworked once the core functions are working.
 
+Need to develop testing procedures for all package functions.
+
+It's important that functions are written in a way that is agnositc to data management and workflow. For example, they should accept simple data frames rather than requiring a lab-specific compount table. This allows users to change how they do thing, but still allow the pacakge to be useful. It requires them to do more data cleaning, but that's normal. Refine this idea.
+
 # **Functions in Package**
 
 ## pretty_fa_names()
@@ -49,12 +53,14 @@ Function takes cross-tab file of peak area results from external standards and c
 
 ```r
 calc_gc_response_factor <- function(ext_std_areas, compound_table) {
-    # Do some stuff.
+    # accept df containing peak areas of external standards
+    # require df containing prop of each FA in ext standards
+    # require vector containing concs of external standards
+    # Uses above to calc lm() with b=0 on each column (FA)
+    # outputs df containing FA names & calculated RFs
 }
 
 # uses find_fa_name() to ID which columns to perform calculations on 
-
-# calls pretty_fa_names() on FA columns to standardize FA names.
 
 # calculates linear model using peak area & FA concentration in external standard to calculate instrument response factors. 
 
