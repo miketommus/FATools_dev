@@ -161,6 +161,6 @@ mean2 <- function(x, ..., na.rm = FALSE, trim = 0) {
 * Use of Git locally on your computer for version control is highly recommended. In order to keep the commit history clean, please use the [The Repeated Amend](https://happygitwithr.com/repeated-amend) technique and only push commits to the GitHub repo that represent a unified chunk of work. 
 * Clean, easy-to-read & maintain code. Minimize dependencies to highly used, reputable, and well-maintained packages.
 
-
+add some shit
 
 
