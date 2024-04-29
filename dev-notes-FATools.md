@@ -14,7 +14,7 @@
 
 I don't know if this doc should be included in the main repo, made into its own repo, or kept private. Figure this out. 
 
-Overall, package documentation sucks and really needs to be reworked once the core functions are working.
+Overall, package [documentation](https://style.tidyverse.org/documentation.html) sucks and really needs to be reworked once the core functions are working. 
 
 Need to develop testing procedures for all package functions.
 
@@ -22,17 +22,34 @@ It's important that functions are written in a way that is agnositc to data mana
 
 # **Functions in Package**
 
-## pretty_fa_names()
+## convert_fa_name()
 
 Function that accepts FA names in a variety of formats and will interconvert them between several supported standardized ways of writing FA names.
 
+```r
+x <- c("c16.1w7c", "18.0", "20_1_w9", "i 15:0")
+
+convert_fa_name(x)
+# returns c("16:1ω7c", "18:0", "20:1ω9", "i-15:0")
+
+convert_fa_name(x, style = 3, notation = "n", sep = ".")
+# returns c("16.1 (n-7) c", "18.0", "20.1 (n-9)", "i-15.0")
+```
+
 * ~~Needs a new name. Make it singular. Maybe change it to convert_fa_name().~~
 * Needs to be more throughly tested. Someone should write some tests. 
+* Need to reevaluate required vs default arguments.
 * Need to add some error checking. Use regex to look for unusual chars or unusual formats. Return which FA are problematic so user can fix them. 
 
 ## find_fa_name()
 
 Function to search through vector for fatty acid names. Returns a vector of indexes.
+
+```r
+x <- c("c16.1w7c", "not-a-fa", "sample_id", "18.0", "20_1_w9", "i 15:0")
+# Returns: 1, 4, 5, 6
+find_fa_name(x)
+```
 
 * Should this have any options to return different values?
 
@@ -82,7 +99,7 @@ convert_area_to_conc <- function() {
     # analytical samples
 
 # calculate response factors on external samples
-    # calls pretty_fa_names() to standardize
+    # calls convert_fa_name() to standardize
     # uses linear model with 0 intercept
     # 
 ```
@@ -124,15 +141,25 @@ convert_result_to_prop <- function() {
 [Git Visual Cheatsheet](https://ndpsoftware.com/git-cheatsheet.html#loc=workspace;)
 
 
+# **R Package Development Notes**
+
+* Use imperitive mood for naming functions e.g. do() not did() or does(), mutate() not mutated() or mutates(), hide() not hid() or hides().
+* Avoid writing functions that use locale or global options.
+* Put the most important function arguments first.
+* Required arguments shouldn't have defaults, optional arguments should have defaults. 
+*  Put ... after required arguments & before optional arguments. example:
+```r
+mean2 <- function(x, ..., na.rm = FALSE, trim = 0) {
+  mean(x, ..., na.rm = na.rm, trim = trim)
+}
+```
+
 # **Collaboration Guidelines**
 
-[GitHub](https://github.com/miketommus/FATools) will be the main repository and "source of truth" for the project.
-
-All dev work should be done on branches and then a pull request used to merge with master branch. 
-
-Use of Git locally on your computer for version control is highly recommended. In order to keep the commit history clean, please use the [The Repeated Amend](https://happygitwithr.com/repeated-amend) technique and only push commis to the GitHub repo that represent a unified chunk of work. 
-
-Clean, easy-to-read & maintain code. Minimize dependencies. 
+* [GitHub](https://github.com/miketommus/FATools) will be the main repository and "source of truth" for the project.
+* All dev work should be done on branches and then a pull request used to merge with master branch. 
+* Use of Git locally on your computer for version control is highly recommended. In order to keep the commit history clean, please use the [The Repeated Amend](https://happygitwithr.com/repeated-amend) technique and only push commits to the GitHub repo that represent a unified chunk of work. 
+* Clean, easy-to-read & maintain code. Minimize dependencies to highly used, reputable, and well-maintained packages.
 
 
 
