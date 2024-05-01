@@ -46,12 +46,12 @@ convert_fa_name(x, style = 3, notation = "n", sep = ".")
 
 * ~~Needs a new name. Make it singular. Maybe change it to convert_fa_name().~~
 * Needs to be more throughly tested. Someone should write some tests. 
-* Need to reevaluate required vs default arguments.
+* ~~Need to reevaluate required vs default arguments.~~
 * Need to add some error checking. Use regex to look for unusual chars or unusual formats. Return which FA are problematic so user can fix them. 
 
 ## find_fa_name()
 
-Function to search through vector for fatty acid names. Returns a vector of indexes.
+Function to search through character vector for fatty acid names. Returns an integer vector of indexes.
 
 ```r
 x <- c("c16.1w7c", "not-a-fa", "sample_id", "18.0", "20_1_w9", "i 15:0")
