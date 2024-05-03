@@ -25,8 +25,14 @@ mean2 <- function(x, ..., na.rm = FALSE, trim = 0) {
 
 ## Current State of the Package
 
+* There is currently an [example script](https://github.com/miketommus/example-fatty-acid-analysis/blob/master/using_FATools.R) showing how to use the package. Needs more testing and documentation.
 * Overall, package [documentation](https://style.tidyverse.org/documentation.html) sucks and really needs to be reworked once the core functions are working. 
 * Need to develop testing procedures for all package functions.
+* ~~Need to remove convert_fa_name() dependencies from all packages that currently have it. Just require users to convert their FA names before running those functions.~~
+
+# **Functions To Add**
+
+This section currently empty.
 
 # **Functions in Package**
 
@@ -34,102 +40,138 @@ mean2 <- function(x, ..., na.rm = FALSE, trim = 0) {
 
 Function that accepts FA names in a variety of formats and will interconvert them between several supported standardized ways of writing FA names.
 
-```r
-x <- c("c16.1w7c", "18.0", "20_1_w9", "i 15:0")
-
-convert_fa_name(x)
-# returns c("16:1ω7c", "18:0", "20:1ω9", "i-15:0")
-
-convert_fa_name(x, style = 3, notation = "n", sep = ".")
-# returns c("16.1 (n-7) c", "18.0", "20.1 (n-9)", "i-15.0")
-```
-
-* ~~Needs a new name. Make it singular. Maybe change it to convert_fa_name().~~
-* Needs to be more throughly tested. Someone should write some tests. 
+* ~~Needs a new name. Make it singular. Maybe change it to convert_fa_name().~~ 
 * ~~Need to reevaluate required vs default arguments.~~
 * Need to add some error checking. Use regex to look for unusual chars or unusual formats. Return which FA are problematic so user can fix them. 
 
+```r
+# A vector containing fatty acid names written in various ways
+x <- c("c16.1w7c", "18.0", "20_1_w9", "i 15:0")
+
+# Returns c("16:1ω7c", "18:0", "20:1ω9", "i-15:0")
+convert_fa_name(x)
+
+# Returns c("16.1 (n-7) c", "18.0", "20.1 (n-9)", "i-15.0")
+convert_fa_name(
+    x,
+    style = 3,
+    sep = ".",
+    prefix_sep = "-",
+    notation = "n"
+)
+```
 ## find_fa_name()
 
 Function to search through character vector for fatty acid names. Returns an integer vector of indexes.
 
 ```r
-x <- c("c16.1w7c", "not-a-fa", "sample_id", "18.0", "20_1_w9", "i 15:0")
-# Returns: 1, 4, 5, 6
-find_fa_name(x)
+ # Character vector containing some fatty acid names
+ x <- c("c16.1w7c", "not-a-fa", "sample_id", "18.0", "20_1_w9", "i 15:0")
+
+ # Returns integer vector c(1L, 4L, 5L, 6L)
+ find_fa_name(x)
 ```
-
-* Should this have any options to return different values?
-
-```r
-
-find_fa_name <- function(x) {
-  # do tha thang
-  grep("[1-9]?[0-9][[:punct:]][0-9][1-9]?", x)
-}
-
-```
-
-# **Functions To Add**
 
 ## calc_gc_response_factor()
 
 Function takes cross-tab file of peak area results from external standards and creates an array containing FA names & RF. 
+* This function is working, but it's not spiting out a dataframe with the correct colnames or data types.
 
 ```r
-calc_gc_response_factor <- function(ext_std_areas, compound_table) {
-    # accept df containing peak areas of external standards
-    # require df containing prop of each FA in ext standards
-    # require vector containing concs of external standards
-    # Uses above to calc lm() with b=0 on each column (FA)
-    # outputs df containing FA names & calculated RFs
-}
+# Make example peak area results
+peak_areas <- data.frame(
+  c(59690, 197032, 394075, 1041447),
+  c(124260, 410732, 851543, 2092255),
+  c(249962, 869479, 1895680, 4448913)
+)
 
-# uses find_fa_name() to ID which columns to perform calculations on 
+colnames(
+  peak_areas
+) <- c("8.0", "10.0", "16.0")
 
-# calculates linear model using peak area & FA concentration in external standard to calculate instrument response factors. 
+# Make example external standards proportions list
+ext_standard_proportions <- data.frame(
+  fa = c("8.0", "10.0", "16.0"),
+  prop = as.numeric(c(0.01, 0.02, 0.05))
 
-# returns a dataframe with FA & RF values
+# Calculate response factors
+calc_gc_response_factor(
+  peak_areas,
+  ext_std_concs = c(15, 50, 100, 250),
+  ext_std_contents = ext_standard_proportions
+)
 ```
 
 ## convert_area_to_conc()
 Function to post-process GCMS data and convert peak areas into FAME concentrations.
 
+* Need to add better error messaging about which FA are missing from rf_map.
+
 ```r
-convert_area_to_conc <- function() {
-    # Do tha thang.
-}
+# example compound peak area data
+data <- data.frame(
+  runif(5, min = 1000, max = 3000000),
+  runif(5, min = 1000, max = 3000000),
+  runif(5, min = 1000, max = 3000000),
+  runif(5, min = 1000, max = 3000000),
+  runif(5, min = 1000, max = 3000000),
+  runif(5, min = 1000, max = 3000000)
+)
+names(data) <- c("8:0", "10:0", "12:0", "14:0", "i-15:0", "15:0")
 
-# read in raw gcms output (peak areas)
+# example response factor table
+rf_table <- data.frame(
+  fa = c("10:0", "8:0", "12:0", "14:0", "i-15:0", "15:0"),
+  rf = c(15000, 15000, 16000, 12000, 0, 10000)
+)
 
-# split data into two sections:
-    # external standards
-    # analytical samples
+# example response factor map
+rf_map <- data.frame(
+  fa = c("8:0", "10:0", "12:0", "14:0", "i-15:0", "15:0"),
+  ref_fa = c(NA, NA, NA, NA, "15:0", NA)
+)
 
-# calculate response factors on external samples
-    # calls convert_fa_name() to standardize
-    # uses linear model with 0 intercept
-    # 
+# Convert areas to concentration
+convert_area_to_conc(data, rf_table, rf_map = rf_map)
+
 ```
 
 ## adjust_conc_for_tissue_mass()
 Function to take FAME concentrations and adjust them for the amount of tissue extracted. Also needs to account for the fraction of lipid extract processed for derivatization. 
 
+* Improve documentation to describe the adjustments for lipid extract and volume used for derivatization.
+
 ```r
-adjust_conc_for_tissue_mass <- function() {
-    # doit.
-}
+# example data
+ data <- data.frame(
+   runif(5, min = 1, max = 10),
+   runif(5, min = 1, max = 10),
+   runif(5, min = 1, max = 10)
+ )
+ names(data) <- c("8:0", "10:0", "12:0")
+ tiss_mass <- rep(10, 5)
+
+ # Adjust concentration for tissue mass
+ adjust_conc_for_tissue_mass(data, tiss_mass)
+
 ```
 
 ## convert_result_to_prop()
 Function to convert concentrations into proportions. Basically all it needs to do is divide each FA concentration value by the sum of the row.
 
-* This could even be used for peak areas, not just concentrations. 
-
 ```r
-convert_result_to_prop <- function() {
-    # doit.
-}
+ # example data
+ data <- data.frame(
+   runif(5, min = 1000, max = 300000),
+   runif(5, min = 1000, max = 300000),
+   runif(5, min = 1000, max = 300000),
+   runif(5, min = 1000, max = 300000),
+   runif(5, min = 1000, max = 300000)
+ )
+ names(data) <- c("8:0", "10:0", "12:0", "13:0", "14:0")
+
+ # Convert example data to proportions
+ convert_result_to_prop(data)
 ```
 
 # **R Package Development Resources**
