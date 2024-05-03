@@ -32,7 +32,9 @@ mean2 <- function(x, ..., na.rm = FALSE, trim = 0) {
 
 # **Functions To Add**
 
-This section currently empty.
+## filter_compound_by_prop()
+
+Function that accepts GCMS proportion data and will filter out compounds that are below a threshold defined by the user (e.g. filter all FA that are less than 1% of total FA).
 
 # **Functions in Package**
 
@@ -75,7 +77,7 @@ Function to search through character vector for fatty acid names. Returns an int
 ## calc_gc_response_factor()
 
 Function takes cross-tab file of peak area results from external standards and creates an array containing FA names & RF. 
-* This function is working, but it's not spiting out a dataframe with the correct colnames or data types.
+* This function currently sorts all concentrations and peak areas before it's calc. Should prob add error checking to ensure that all external standards are in order.
 
 ```r
 # Make example peak area results
@@ -106,6 +108,7 @@ calc_gc_response_factor(
 Function to post-process GCMS data and convert peak areas into FAME concentrations.
 
 * Need to add better error messaging about which FA are missing from rf_map.
+* Add warning if FA are not converted when user doesn't input an rf_map.
 
 ```r
 # example compound peak area data
