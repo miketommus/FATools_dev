@@ -36,6 +36,25 @@ mean2 <- function(x, ..., na.rm = FALSE, trim = 0) {
 
 Function that accepts GCMS proportion data and will filter out compounds that are below a threshold defined by the user (e.g. filter all FA that are less than 1% of total FA).
 
+We don't actually have to compute this prior to calculating proportions. User can call this function after calling convert_results_to_prop(). All this will need to do is calc col means and then remove cols not above min_prop threshold. 
+
+```r
+filter_fa_by_prop <- function (data, min_prop) {
+  # code here.
+}
+
+# Function from example-analysis to filter FA by those >= the decimal % in filter
+filterFA <- function (data, filter = 0.01) {
+    data %>%
+    dplyr::group_by(FA) %>%
+    dplyr::summarise(mean = mean(Proportion)) %>%
+    dplyr::filter(mean >= filter) %>%
+    dplyr::select(FA) %>%
+    unique %>%
+    as.vector
+}
+```
+
 # **Functions in Package**
 
 ## convert_fa_name()
